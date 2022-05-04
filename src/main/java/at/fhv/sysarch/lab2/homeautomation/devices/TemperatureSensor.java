@@ -21,6 +21,11 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
         }
     }
 
+    public static final class RequestTemperatureFromEnvironment implements TemperatureCommand {
+
+    }
+
+
     public static Behavior<TemperatureCommand> create(
             ActorRef<AirCondition.AirConditionCommand> airCondition,
             ActorRef<Environment.EnvironmentCommand> environment, 
@@ -35,7 +40,14 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
     private ActorRef<AirCondition.AirConditionCommand> airCondition;
     private ActorRef<Environment.EnvironmentCommand> environment;
 
-    public TemperatureSensor(ActorContext<TemperatureCommand> context, ActorRef<AirCondition.AirConditionCommand> airCondition, String groupId, String deviceId) {
+    public TemperatureSensor(
+            ActorContext<TemperatureCommand> context,
+            ActorRef<AirCondition.AirConditionCommand> airCondition,
+            ActorRef<Environment.EnvironmentCommand> environment,
+            String groupId,
+            String deviceId,
+            TimerScheduler<TemperatureSensor.TemperatureCommand> temperatureTimeScheduler
+    ) {
         super(context);
         this.airCondition = airCondition;
         this.groupId = groupId;
@@ -53,6 +65,13 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
                 .onMessage(ReadTemperature.class, this::onReadTemperature)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
+    }
+
+    private Behavior<TemperatureCommand> onRequestTemperatureFromEnvironment(RequestTemperatureFromEnvironment e) {
+        //please commit this too
+        environment.tell(new Environment.ReceiveTemperatureRequest(getContext().getSelf()));
+
+        return this;
     }
 
     private Behavior<TemperatureCommand> onReadTemperature(ReadTemperature r) {
