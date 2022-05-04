@@ -55,7 +55,7 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
         this.environment = environment;
 
         getContext().getLog().info("TemperatureSensor started");
-        temperatureTimeScheduler.startTimerAtFixedRate(new RequestTemperatureFromEnvironment(), Duration.ofSeconds(1));
+        temperatureTimeScheduler.startTimerAtFixedRate(new RequestTemperatureFromEnvironment(), Duration.ofSeconds(5));
     }
 
     @Override
@@ -68,9 +68,7 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
     }
 
     private Behavior<TemperatureCommand> onRequestTemperatureFromEnvironment(RequestTemperatureFromEnvironment e) {
-        //please commit this too
         environment.tell(new Environment.ReceiveTemperatureRequest(getContext().getSelf()));
-
         return this;
     }
 
