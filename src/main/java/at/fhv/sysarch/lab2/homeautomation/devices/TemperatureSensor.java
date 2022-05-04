@@ -3,11 +3,10 @@ package at.fhv.sysarch.lab2.homeautomation.devices;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.PostStop;
-import akka.actor.typed.javadsl.AbstractBehavior;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.javadsl.Receive;
+import akka.actor.typed.javadsl.*;
+import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
 
+import java.time.Duration;
 import java.util.Optional;
 
 public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.TemperatureCommand> {
@@ -15,41 +14,51 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
     public interface TemperatureCommand {}
 
     public static final class ReadTemperature implements TemperatureCommand {
-        final Optional<Double> value;
+        Temperature temperature;
 
-        public ReadTemperature(Optional<Double> value) {
-            this.value = value;
+        public ReadTemperature(Temperature temperature){
+            this.temperature = temperature;
         }
     }
 
-    public static Behavior<TemperatureCommand> create(ActorRef<AirCondition.AirConditionCommand> airCondition, String groupId, String deviceId) {
-        return Behaviors.setup(context -> new TemperatureSensor(context, airCondition, groupId, deviceId));
+    public static Behavior<TemperatureCommand> create(
+            ActorRef<AirCondition.AirConditionCommand> airCondition,
+            ActorRef<Environment.EnvironmentCommand> environment, 
+            String groupId, 
+            String deviceId
+    ) {
+        return Behaviors.setup(context -> Behaviors.withTimers(timer -> new TemperatureSensor(context, airCondition, environment, groupId, deviceId, timer)));
     }
 
     private final String groupId;
     private final String deviceId;
     private ActorRef<AirCondition.AirConditionCommand> airCondition;
+    private ActorRef<Environment.EnvironmentCommand> environment;
 
     public TemperatureSensor(ActorContext<TemperatureCommand> context, ActorRef<AirCondition.AirConditionCommand> airCondition, String groupId, String deviceId) {
         super(context);
         this.airCondition = airCondition;
         this.groupId = groupId;
         this.deviceId = deviceId;
+        this.environment = environment;
 
         getContext().getLog().info("TemperatureSensor started");
+        temperatureTimeScheduler.startTimerAtFixedRate(new RequestTemperatureFromEnvironment(), Duration.ofSeconds(1));
     }
 
     @Override
     public Receive<TemperatureCommand> createReceive() {
         return newReceiveBuilder()
+                .onMessage(RequestTemperatureFromEnvironment.class, this::onRequestTemperatureFromEnvironment)
                 .onMessage(ReadTemperature.class, this::onReadTemperature)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }
 
     private Behavior<TemperatureCommand> onReadTemperature(ReadTemperature r) {
-        getContext().getLog().info("TemperatureSensor received {}", r.value.get());
-        this.airCondition.tell(new AirCondition.EnrichedTemperature(r.value, Optional.of("Celsius")));
+        getContext().getLog().info("TemperatureSensor received {}", r.temperature.getValue());
+        this.airCondition.tell(new AirCondition.EnrichedTemperature(Optional.of(r.temperature.getValue()), Optional.of(r.temperature.getUnit())));
+        System.out.println("TemperatureSensor received: " + r.temperature.getValue());
         return this;
     }
 

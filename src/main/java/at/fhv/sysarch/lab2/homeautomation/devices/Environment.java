@@ -1,7 +1,9 @@
 package at.fhv.sysarch.lab2.homeautomation.devices;
 
+import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
+import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
 
 import java.time.Duration;
 import java.util.Random;
@@ -17,11 +19,19 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
     public static final class WeatherChanger implements EnvironmentCommand {
     }
 
+    public static final class ReceiveTemperatureRequest implements EnvironmentCommand {
+        ActorRef<TemperatureSensor.TemperatureCommand> temperatureSensor;
+
+        public ReceiveTemperatureRequest(ActorRef<TemperatureSensor.TemperatureCommand> temperatureSensor) {
+            this.temperatureSensor = temperatureSensor;
+        }
+    }
+
     public static Behavior<EnvironmentCommand> create() {
         return Behaviors.setup(context -> Behaviors.withTimers(timers -> new Environment(context, timers, timers)));
     }
 
-    private double temperature = 23.0;
+    private Temperature temperature = new Temperature(23, "Celsius");
     private boolean isSunny = false;
     private boolean setHighTemp = false;
     private boolean setLowTemp = true;
@@ -42,17 +52,23 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
     @Override
     public Receive<EnvironmentCommand> createReceive() {
         return newReceiveBuilder()
+                .onMessage(ReceiveTemperatureRequest.class, this::onReceiveTemperatureRequest)
                 .onMessage(TemperatureChanger.class, this::onTemperatureChange)
                 .onMessage(WeatherChanger.class, this::onWeatherChange)
                 .build();
     }
 
+    private Behavior<EnvironmentCommand> onReceiveTemperatureRequest(ReceiveTemperatureRequest request){
+        request.temperatureSensor.tell(new TemperatureSensor.ReadTemperature(temperature));
+        return this;
+    }
+
     private Behavior<EnvironmentCommand> onTemperatureChange(TemperatureChanger temperatureChanger) {
         Random rand = new Random();
 
-        temperature += 4 * rand.nextDouble() - 2;
+        temperature.setValue(temperature.getValue() + 4 * rand.nextDouble() - 2);
 
-        if (temperature >= 25) {
+        if (temperature.getValue() >= 25) {
             setHighTemp = true;
             setLowTemp = false;
         } else {
@@ -60,7 +76,7 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
             setHighTemp = false;
         }
 
-        System.out.println("Temperature: " + temperature);
+        System.out.println("Temperature: " + temperature.getValue() + " " + temperature.getUnit());
 
         return this;
     }
