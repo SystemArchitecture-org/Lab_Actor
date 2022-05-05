@@ -16,7 +16,8 @@ public class WeatherSensor extends AbstractBehavior<WeatherSensor.WeatherCommand
 
     public static final class RequestWeatherFromEnvironment implements WeatherCommand {
     }
-    public static final class ReadWeather implements WeatherCommand{
+
+    public static final class ReadWeather implements WeatherCommand {
         WeatherCondition weather;
 
         public ReadWeather(WeatherCondition weather) {

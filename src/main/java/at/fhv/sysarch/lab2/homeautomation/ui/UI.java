@@ -23,6 +23,7 @@ public class UI extends AbstractBehavior<Void> {
     private ActorRef<AirCondition.AirConditionCommand> airCondition;
     private ActorRef<TemperatureSensor.TemperatureCommand> tempSensor;
     private ActorRef<WeatherSensor.WeatherCommand> weatherSensor;
+//    private ActorRef<Blinds.BlindsCommand> weatherSensor;
 
     public static Behavior<Void> create(
             ActorRef<Environment.EnvironmentCommand> environment,
@@ -49,6 +50,7 @@ public class UI extends AbstractBehavior<Void> {
         this.airCondition = airCondition;
         this.tempSensor = tempSensor;
         this.weatherSensor = weatherSensor;
+
 
         new Thread(this::runCommandLine).start();
 

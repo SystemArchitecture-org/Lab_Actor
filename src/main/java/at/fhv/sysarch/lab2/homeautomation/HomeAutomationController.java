@@ -20,6 +20,7 @@ public class HomeAutomationController extends AbstractBehavior<Void> {
     private ActorRef<AirCondition.AirConditionCommand> airCondition;
     private ActorRef<TemperatureSensor.TemperatureCommand> tempSensor;
     private ActorRef<WeatherSensor.WeatherCommand> weatherSensor;
+    private ActorRef<Blinds.BlindsCommand> blinds;
 
     public static Behavior<Void> create() {
         return Behaviors.setup(HomeAutomationController::new);
@@ -31,10 +32,12 @@ public class HomeAutomationController extends AbstractBehavior<Void> {
         // TODO: consider guardians and hierarchies. Who should create and communicate with which Actors?
 
         this.environment = getContext().spawn(Environment.create(), "Environment");
+
         this.airCondition = getContext().spawn(AirCondition.create("2", "1"), "AirCondition");
         this.tempSensor = getContext().spawn(TemperatureSensor.create(this.airCondition, this.environment, "1", "1"), "TemperatureSensor");
-        this.weatherSensor = getContext().spawn(WeatherSensor.create(this.environment, "3", "1"), "WeatherSensor");
 
+        this.blinds = getContext().spawn(Blinds.create("4", "1"), "Blinds");
+        this.weatherSensor = getContext().spawn(WeatherSensor.create(this.environment, this.blinds, "3", "1"), "WeatherSensor");
 
         ActorRef<Void> ui = getContext().spawn(UI.create(this.environment, this.airCondition, this.tempSensor, this.weatherSensor), "UI");
         getContext().getLog().info("HomeAutomation Application started");

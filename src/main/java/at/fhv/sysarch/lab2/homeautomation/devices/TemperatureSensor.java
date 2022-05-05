@@ -27,7 +27,7 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
 
     public static Behavior<TemperatureCommand> create(
             ActorRef<AirCondition.AirConditionCommand> airCondition,
-            ActorRef<Environment.EnvironmentCommand> environment, 
+            ActorRef<Environment.EnvironmentCommand> environment,
             String groupId, 
             String deviceId
     ) {

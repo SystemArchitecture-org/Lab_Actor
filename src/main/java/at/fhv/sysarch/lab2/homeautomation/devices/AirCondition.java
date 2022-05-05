@@ -66,14 +66,14 @@ public class AirCondition extends AbstractBehavior<AirCondition.AirConditionComm
     }
 
     private Behavior<AirConditionCommand> onReadTemperature(EnrichedTemperature r) {
-        getContext().getLog().info("Aircondition reading {}", r.value.get());
+        getContext().getLog().info("AirCondition reading {}", r.value.get());
 
         if(r.value.get() >= 20) {
-            getContext().getLog().info("Aircondition activated");
+            getContext().getLog().info("AirCondition activated");
             this.active = true;
         }
         else {
-            getContext().getLog().info("Aircondition deactivated");
+            getContext().getLog().info("AirCondition deactivated");
             this.active =  false;
         }
 
@@ -81,24 +81,26 @@ public class AirCondition extends AbstractBehavior<AirCondition.AirConditionComm
     }
 
     private Behavior<AirConditionCommand> onPowerAirConditionOff(PowerAirCondition r) {
-        getContext().getLog().info("Turning Aircondition to {}", r.value);
+        getContext().getLog().info("Turning AirCondition to {}", r.value);
 
-        if(r.value.get() == false) {
+        if(!r.value.get()) {
             return this.powerOff();
         }
+
         return this;
     }
 
     private Behavior<AirConditionCommand> onPowerAirConditionOn(PowerAirCondition r) {
-        getContext().getLog().info("Turning Aircondition to {}", r.value);
+        getContext().getLog().info("Turning AirCondition to {}", r.value);
 
-        if(r.value.get() == true) {
+        if(r.value.get()) {
             return Behaviors.receive(AirConditionCommand.class)
                     .onMessage(EnrichedTemperature.class, this::onReadTemperature)
                     .onMessage(PowerAirCondition.class, this::onPowerAirConditionOff)
                     .onSignal(PostStop.class, signal -> onPostStop())
                     .build();
         }
+
         return this;
     }
 
@@ -111,7 +113,7 @@ public class AirCondition extends AbstractBehavior<AirCondition.AirConditionComm
     }
 
     private AirCondition onPostStop() {
-        getContext().getLog().info("TemperatureSensor actor {}-{} stopped", groupId, deviceId);
+        getContext().getLog().info("AirCondition actor {}-{} stopped", groupId, deviceId);
         return this;
     }
 }
