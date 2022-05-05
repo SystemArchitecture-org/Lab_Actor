@@ -107,6 +107,7 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
         return this;
     }
 
+    //TODO: do we need ignoring replies?
     private Behavior<FridgeCommand> onConsumeProduct(ConsumeProductCommand c) {
         if (products.contains(c.product)) {
             products.remove(c.product);
@@ -116,6 +117,8 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
         }
         return this;
     }
+
+    //TODO: The Fridge allows for querying the history of orders.
 
     private Behavior<FridgeCommand> onStockFridge(StockFridgeCommand c) {
         products.add(c.product);

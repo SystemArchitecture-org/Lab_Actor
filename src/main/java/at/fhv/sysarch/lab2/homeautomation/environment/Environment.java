@@ -117,7 +117,7 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
     }
 
     private Behavior<EnvironmentCommand> onSetTemperature(SetTemperatureCommand c) {
-        this.temperature = c.temperature;
+        this.temperature.setValue(c.temperature.getValue());
         return this;
     }
 

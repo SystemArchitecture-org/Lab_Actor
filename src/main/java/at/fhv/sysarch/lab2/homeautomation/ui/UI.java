@@ -9,6 +9,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import at.fhv.sysarch.lab2.homeautomation.devices.*;
 import at.fhv.sysarch.lab2.homeautomation.devices.fridge.Fridge;
+import at.fhv.sysarch.lab2.homeautomation.domain.enums.WeatherCondition;
 import at.fhv.sysarch.lab2.homeautomation.domain.valueobjects.Product;
 import at.fhv.sysarch.lab2.homeautomation.environment.Environment;
 import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
@@ -65,6 +66,7 @@ public class UI extends AbstractBehavior<Void> {
         return this;
     }
 
+    //TODO: UI OK?
     public void runCommandLine() {
         Scanner scanner = new Scanner(System.in);
         String[] input = null;
@@ -112,9 +114,14 @@ public class UI extends AbstractBehavior<Void> {
             if (command[0].equals("fdis")) {
                 this.fridge.tell(new Fridge.DisplayStockCommand());
             }
-            if (command[0].equals("etemp")) {
-                //TODO: implement set temp on environment
+            if (command[0].equals("et")) {
                 this.environment.tell(new Environment.SetTemperatureCommand(new Temperature(Double.parseDouble(command[1]), "Celsius")));
+            }
+            if (command[0].equals("ew")) {
+                this.environment.tell(new Environment.SetWeatherCommand(WeatherCondition.valueOf(command[1])));
+            }
+            if (command[0].equals("?")) {
+                //TODO: print commands
             }
         }
 
