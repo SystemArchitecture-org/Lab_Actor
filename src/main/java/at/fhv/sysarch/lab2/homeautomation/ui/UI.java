@@ -69,7 +69,7 @@ public class UI extends AbstractBehavior<Void> {
     //TODO: UI OK?
     public void runCommandLine() {
         Scanner scanner = new Scanner(System.in);
-        String[] input = null;
+//        String[] input = null;
         String reader = "";
 
         while (!reader.equalsIgnoreCase("quit") && scanner.hasNextLine()) {

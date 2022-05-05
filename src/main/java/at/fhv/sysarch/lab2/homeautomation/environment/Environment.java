@@ -99,11 +99,10 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
     }
 
     private Behavior<EnvironmentCommand> onTemperatureChange(TemperatureChangerCommand temperatureChanger) {
-        Random rand = new Random();
+        double newRanValue = this.temperature.getValue() + (4 * new Random().nextDouble() - 2);
 
-        temperature.setValue(temperature.getValue() + 4 * rand.nextDouble() - 2);
-
-        if (temperature.getValue() >= 25) {
+        //TODO: Do we need this?
+        if (newRanValue >= 25) {
             setHighTemp = true;
             setLowTemp = false;
         } else {
@@ -111,7 +110,9 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
             setHighTemp = false;
         }
 
-        System.out.println("Temperature: " + temperature.getValue() + " " + temperature.getUnit());
+        this.temperature.setValue(newRanValue);
+
+        System.out.println("Temperature: " + newRanValue + " " + this.temperature.getUnit());
 
         return this;
     }
