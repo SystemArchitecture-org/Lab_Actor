@@ -27,8 +27,9 @@ public class Blinds extends AbstractBehavior<Blinds.BlindsCommand> {
         }
     }
 
-    public static Behavior<BlindsCommand> create(String groupId,
-                                                 String deviceId
+    public static Behavior<BlindsCommand> create(
+            String groupId,
+            String deviceId
     ) {
         return Behaviors.setup(context -> new Blinds(context, groupId, deviceId));
     }

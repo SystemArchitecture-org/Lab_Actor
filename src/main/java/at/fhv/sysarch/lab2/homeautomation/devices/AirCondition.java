@@ -6,6 +6,7 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
+import java.util.Optional;
 
 /**
  * This class shows ONE way to switch behaviors in object-oriented style. Another approach is the use of static
@@ -17,8 +18,8 @@ import akka.actor.typed.javadsl.Receive;
  * For an example with functional-style please refer to: {@link https://doc.akka.io/docs/akka/current/typed/style-guide.html#functional-versus-object-oriented-style}
  *
  */
-import java.util.Optional;
 
+@SuppressWarnings("JavadocReference")
 public class AirCondition extends AbstractBehavior<AirCondition.AirConditionCommand> {
 
     public interface AirConditionCommand {
@@ -42,6 +43,10 @@ public class AirCondition extends AbstractBehavior<AirCondition.AirConditionComm
         }
     }
 
+    public static Behavior<AirConditionCommand> create(String groupId, String deviceId) {
+        return Behaviors.setup(context -> new AirCondition(context, groupId, deviceId));
+    }
+
     private final String groupId;
     private final String deviceId;
     private boolean active = false;
@@ -52,10 +57,6 @@ public class AirCondition extends AbstractBehavior<AirCondition.AirConditionComm
         this.groupId = groupId;
         this.deviceId = deviceId;
         getContext().getLog().info("AirCondition started");
-    }
-
-    public static Behavior<AirConditionCommand> create(String groupId, String deviceId) {
-        return Behaviors.setup(context -> new AirCondition(context, groupId, deviceId));
     }
 
     @Override

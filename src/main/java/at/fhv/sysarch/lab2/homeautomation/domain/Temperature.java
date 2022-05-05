@@ -1,6 +1,7 @@
 package at.fhv.sysarch.lab2.homeautomation.domain;
 
 public class Temperature {
+
     private double value;
     private String unit;
 
@@ -24,4 +25,5 @@ public class Temperature {
     public void setUnit(String unit) {
         this.unit = unit;
     }
+
 }
