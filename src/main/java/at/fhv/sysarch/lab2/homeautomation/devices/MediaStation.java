@@ -39,14 +39,16 @@ public class MediaStation extends AbstractBehavior<MediaStation.MediaStationComm
         this.blinds = blinds;
         this.groupId = groupId;
         this.deviceId = deviceId;
+
+        getContext().getLog().info("MediaStation started");
     }
 
 
     @Override
     public Receive<MediaStation.MediaStationCommand> createReceive() {
         return newReceiveBuilder()
-                .onMessage(MediaStation.StartMovieCommand.class, this::onStartMovie)
-                .onMessage(MediaStation.StopMovieCommand.class, this::onStopMovie)
+                .onMessage(StartMovieCommand.class, this::onStartMovie)
+                .onMessage(StopMovieCommand.class, this::onStopMovie)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }

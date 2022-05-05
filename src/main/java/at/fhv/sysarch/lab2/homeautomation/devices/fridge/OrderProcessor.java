@@ -35,11 +35,12 @@ public class OrderProcessor extends AbstractBehavior<OrderProcessor.OrderProcess
     public static Behavior<OrderProcessorCommand> create(
             ActorRef<Fridge.FridgeCommand> fridge,
             ActorRef<FridgeWeightSensor.FridgeWeightSensorCommand> weightSensor,
+            ActorRef<FridgeSpaceSensor.FridgeSpaceSensorCommand> spaceSensor,
             Product product,
             String groupId,
             String deviceId
     ) {
-        return Behaviors.setup(context -> new OrderProcessor(context, fridge, weightSensor, product, groupId, deviceId));
+        return Behaviors.setup(context -> new OrderProcessor(context, fridge, weightSensor, spaceSensor, product, groupId, deviceId));
     }
 
     private OptionalInt availableSpace = OptionalInt.empty();
@@ -63,11 +64,13 @@ public class OrderProcessor extends AbstractBehavior<OrderProcessor.OrderProcess
             String deviceId
     ) {
         super(context);
+
         this.product = product;
         this.fridge = fridge;
         this.groupId = groupId;
         this.deviceId = deviceId;
         this.weightSensor = weightSensor;
+        this.spaceSensor = spaceSensor;
 
         weightSensor.tell(new FridgeWeightSensor.GetAvailableWeightCommand(getContext().getSelf()));
         spaceSensor.tell(new FridgeSpaceSensor.GetAvailableSpaceCommand(getContext().getSelf()));
@@ -78,36 +81,38 @@ public class OrderProcessor extends AbstractBehavior<OrderProcessor.OrderProcess
     @Override
     public Receive<OrderProcessorCommand> createReceive() {
         return newReceiveBuilder()
-                .onMessage(OrderProcessor.WeightReceivedCommand.class, this::onWeightReceived)
-                .onMessage(OrderProcessor.SpaceReceivedCommand.class, this::onSpaceReceived)
+                .onMessage(WeightReceivedCommand.class, this::onWeightReceived)
+                .onMessage(SpaceReceivedCommand.class, this::onSpaceReceived)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }
 
     private Behavior<OrderProcessorCommand> onWeightReceived(WeightReceivedCommand c) {
         this.availableWeight = OptionalInt.of(c.weight);
-        completeOrContinue();
-        return this;
+
+        return continueOrComplete();
     }
 
     private Behavior<OrderProcessorCommand> onSpaceReceived(SpaceReceivedCommand c) {
         this.availableSpace = OptionalInt.of(c.space);
-        completeOrContinue();
-        return this;
+
+        return continueOrComplete();
     }
 
-    private Behavior<OrderProcessorCommand> completeOrContinue() {
+    private Behavior<OrderProcessorCommand> continueOrComplete() {
         if (availableSpace.isPresent() && availableWeight.isPresent()) {
-            if(availableWeight.getAsInt() > product.getWeight() && availableSpace.getAsInt() > 0){
+            if (availableWeight.getAsInt() > product.getWeight() && availableSpace.getAsInt() > 0) {
                 fridge.tell(new Fridge.StockFridgeCommand(product));
             } else {
-                getContext().getLog().info("Fridge can't be stocked with " + product.getName() +"\n"+
+                getContext().getLog().info("Fridge can't be stocked with " + product.getName() + "\n" +
                         "Available Space: " + availableSpace.getAsInt() + "\n" +
                         "Available Weight: " + availableWeight.getAsInt() + "\n" +
                         "Order Weight: " + product.getWeight());
             }
+
             return Behaviors.stopped();
         }
+
         return this;
     }
 

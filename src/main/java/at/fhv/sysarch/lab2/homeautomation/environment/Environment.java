@@ -16,10 +16,10 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
     public interface EnvironmentCommand {
     }
 
-    public static final class TemperatureChanger implements EnvironmentCommand {
+    public static final class TemperatureChangerCommand implements EnvironmentCommand {
     }
 
-    public static final class WeatherChanger implements EnvironmentCommand {
+    public static final class WeatherChangerCommand implements EnvironmentCommand {
     }
 
     public static final class SetTemperatureCommand implements EnvironmentCommand {
@@ -41,15 +41,15 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
     public static final class ReceiveTemperatureRequestCommand implements EnvironmentCommand {
         ActorRef<TemperatureSensor.TemperatureCommand> temperatureSensor;
 
-        public ReceiveTemperatureRequest(ActorRef<TemperatureSensor.TemperatureCommand> temperatureSensor) {
+        public ReceiveTemperatureRequestCommand(ActorRef<TemperatureSensor.TemperatureCommand> temperatureSensor) {
             this.temperatureSensor = temperatureSensor;
         }
     }
 
-    public static final class ReceiveWeatherRequest implements EnvironmentCommand {
+    public static final class ReceiveWeatherRequestCommand implements EnvironmentCommand {
         ActorRef<WeatherSensor.WeatherCommand> weatherSensor;
 
-        public ReceiveWeatherRequest(ActorRef<WeatherSensor.WeatherCommand> weatherSensor) {
+        public ReceiveWeatherRequestCommand(ActorRef<WeatherSensor.WeatherCommand> weatherSensor) {
             this.weatherSensor = weatherSensor;
         }
     }
@@ -72,31 +72,33 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
         this.temperatureTimeScheduler = temperatureTimeScheduler;
         this.weatherTimeScheduler = weatherTimeScheduler;
 
-        temperatureTimeScheduler.startTimerAtFixedRate(new TemperatureChanger(), Duration.ofSeconds(5));
-        weatherTimeScheduler.startTimerAtFixedRate(new WeatherChanger(), Duration.ofSeconds(5));
+        temperatureTimeScheduler.startTimerAtFixedRate(new TemperatureChangerCommand(), Duration.ofSeconds(5));
+        weatherTimeScheduler.startTimerAtFixedRate(new WeatherChangerCommand(), Duration.ofSeconds(5));
     }
 
     @Override
     public Receive<EnvironmentCommand> createReceive() {
         return newReceiveBuilder()
-                .onMessage(ReceiveTemperatureRequest.class, this::onReceiveTemperatureRequest)
-                .onMessage(ReceiveWeatherRequest.class, this::onReceiveWeatherRequest)
-                .onMessage(TemperatureChanger.class, this::onTemperatureChange)
-                .onMessage(WeatherChanger.class, this::onWeatherChange)
+                .onMessage(ReceiveTemperatureRequestCommand.class, this::onReceiveTemperatureRequest)
+                .onMessage(ReceiveWeatherRequestCommand.class, this::onReceiveWeatherRequest)
+                .onMessage(TemperatureChangerCommand.class, this::onTemperatureChange)
+                .onMessage(WeatherChangerCommand.class, this::onWeatherChange)
+                .onMessage(SetTemperatureCommand.class, this::onSetTemperature)
+                .onMessage(SetWeatherCommand.class, this::onSetWeather)
                 .build();
     }
 
-    private Behavior<EnvironmentCommand> onReceiveTemperatureRequest(ReceiveTemperatureRequest request) {
-        request.temperatureSensor.tell(new TemperatureSensor.ReadTemperature(temperature));
+    private Behavior<EnvironmentCommand> onReceiveTemperatureRequest(ReceiveTemperatureRequestCommand request) {
+        request.temperatureSensor.tell(new TemperatureSensor.ReadTemperatureCommand(temperature));
         return this;
     }
 
-    private Behavior<EnvironmentCommand> onReceiveWeatherRequest(ReceiveWeatherRequest request) {
-        request.weatherSensor.tell(new WeatherSensor.ReadWeather(weatherCondition));
+    private Behavior<EnvironmentCommand> onReceiveWeatherRequest(ReceiveWeatherRequestCommand request) {
+        request.weatherSensor.tell(new WeatherSensor.ReadWeatherCommand(weatherCondition));
         return this;
     }
 
-    private Behavior<EnvironmentCommand> onTemperatureChange(TemperatureChanger temperatureChanger) {
+    private Behavior<EnvironmentCommand> onTemperatureChange(TemperatureChangerCommand temperatureChanger) {
         Random rand = new Random();
 
         temperature.setValue(temperature.getValue() + 4 * rand.nextDouble() - 2);

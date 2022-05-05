@@ -9,7 +9,7 @@ import akka.actor.typed.javadsl.Receive;
 import akka.actor.typed.javadsl.Behaviors;
 import at.fhv.sysarch.lab2.homeautomation.domain.valueobjects.Product;
 
-import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -58,6 +58,7 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
     private final String deviceId;
 
     private final ActorRef<FridgeWeightSensor.FridgeWeightSensorCommand> weightSensor;
+    private final ActorRef<FridgeSpaceSensor.FridgeSpaceSensorCommand> spaceSensor;
 
     public Fridge(
             ActorContext<FridgeCommand> context,
@@ -78,10 +79,15 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
         this.groupId = groupId;
         this.deviceId = deviceId;
 
-        this.weightSensor = getContext().spawn(FridgeWeightSensor.create("1", "1"), "FridgeWeightSensor");
+        this.weightSensor = getContext().spawn(FridgeWeightSensor.create(getWeightOfProducts(), "1", "1"), "FridgeWeightSensor");
+        this.spaceSensor = getContext().spawn(FridgeSpaceSensor.create(products.size(), "1", "1"), "FridgeSpaceSensor");
 
+        getContext().getLog().info("Fridge started");
     }
 
+    private int getWeightOfProducts() {
+        return products.stream().mapToInt(Product::getWeight).sum();
+    }
 
     @Override
     public Receive<FridgeCommand> createReceive() {
@@ -120,7 +126,6 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
     }
 
     private Behavior<FridgeCommand> onDisplayStock(DisplayStockCommand c) {
-
         System.out.println("Fridge content:\n");
 
         for (Product product : this.products) {

@@ -48,14 +48,16 @@ public class Blinds extends AbstractBehavior<Blinds.BlindsCommand> {
 
         this.groupId = groupId;
         this.deviceId = deviceId;
+
+        getContext().getLog().info("Blinds started");
     }
 
     @Override
     public Receive<Blinds.BlindsCommand> createReceive() {
         return newReceiveBuilder()
-                .onMessage(Blinds.OpenBlindsCommand.class, this::onOpenBlindsCommand)
-                .onMessage(Blinds.CloseBlindsCommand.class, this::onCloseBlindsCommand)
-                .onMessage(Blinds.MovieStateChangedCommand.class, this::onMovieStateChangedCommand)
+                .onMessage(OpenBlindsCommand.class, this::onOpenBlindsCommand)
+                .onMessage(CloseBlindsCommand.class, this::onCloseBlindsCommand)
+                .onMessage(MovieStateChangedCommand.class, this::onMovieStateChangedCommand)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }

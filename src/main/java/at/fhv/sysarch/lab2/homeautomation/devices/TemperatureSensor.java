@@ -15,15 +15,15 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
     public interface TemperatureCommand {
     }
 
-    public static final class ReadTemperature implements TemperatureCommand {
+    public static final class ReadTemperatureCommand implements TemperatureCommand {
         Temperature temperature;
 
-        public ReadTemperature(Temperature temperature) {
+        public ReadTemperatureCommand(Temperature temperature) {
             this.temperature = temperature;
         }
     }
 
-    public static final class RequestTemperatureFromEnvironment implements TemperatureCommand {
+    public static final class RequestTemperatureFromEnvironmentCommand implements TemperatureCommand {
     }
 
     public static Behavior<TemperatureCommand> create(
@@ -54,29 +54,29 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
         this.deviceId = deviceId;
         this.environment = environment;
 
-        getContext().getLog().info("TemperatureSensor started");
+        temperatureTimeScheduler.startTimerAtFixedRate(new RequestTemperatureFromEnvironmentCommand(), Duration.ofSeconds(5));
 
-        temperatureTimeScheduler.startTimerAtFixedRate(new RequestTemperatureFromEnvironment(), Duration.ofSeconds(5));
+        getContext().getLog().info("TemperatureSensor started");
     }
 
     @Override
     public Receive<TemperatureCommand> createReceive() {
         return newReceiveBuilder()
-                .onMessage(RequestTemperatureFromEnvironment.class, this::onRequestTemperatureFromEnvironment)
-                .onMessage(ReadTemperature.class, this::onReadTemperature)
+                .onMessage(RequestTemperatureFromEnvironmentCommand.class, this::onRequestTemperatureFromEnvironment)
+                .onMessage(ReadTemperatureCommand.class, this::onReadTemperature)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }
 
-    private Behavior<TemperatureCommand> onRequestTemperatureFromEnvironment(RequestTemperatureFromEnvironment e) {
-        environment.tell(new Environment.ReceiveTemperatureRequest(getContext().getSelf()));
+    private Behavior<TemperatureCommand> onRequestTemperatureFromEnvironment(RequestTemperatureFromEnvironmentCommand c) {
+        environment.tell(new Environment.ReceiveTemperatureRequestCommand(getContext().getSelf()));
         return this;
     }
 
-    private Behavior<TemperatureCommand> onReadTemperature(ReadTemperature r) {
-        getContext().getLog().info("TemperatureSensor received {}", r.temperature.getValue());
-        this.airCondition.tell(new AirCondition.EnrichedTemperature(Optional.of(r.temperature.getValue()), Optional.of(r.temperature.getUnit())));
-        System.out.println("TemperatureSensor received: " + r.temperature.getValue());
+    private Behavior<TemperatureCommand> onReadTemperature(ReadTemperatureCommand c) {
+        getContext().getLog().info("TemperatureSensor received {}", c.temperature.getValue());
+        this.airCondition.tell(new AirCondition.EnrichedTemperatureCommand(Optional.of(c.temperature.getValue()), Optional.of(c.temperature.getUnit())));
+        System.out.println("TemperatureSensor received: " + c.temperature.getValue());
         return this;
     }
 

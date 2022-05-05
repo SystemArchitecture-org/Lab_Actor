@@ -38,35 +38,40 @@ public class FridgeWeightSensor extends AbstractBehavior<FridgeWeightSensor.Frid
     }
 
     public static Behavior<FridgeWeightSensorCommand> create(
+            int currentWeight,
             String groupId,
             String deviceId
     ) {
-        return Behaviors.setup(context -> new FridgeWeightSensor(context, groupId, deviceId));
+        return Behaviors.setup(context -> new FridgeWeightSensor(context, currentWeight, groupId, deviceId));
     }
 
     private final int maxWeight = 100;
-    private int currentWeight = 0;
+    private int currentWeight;
 
     private final String groupId;
     private final String deviceId;
 
     public FridgeWeightSensor(
             ActorContext<FridgeWeightSensorCommand> context,
+            int currentWeight,
             String groupId,
             String deviceId
     ) {
         super(context);
 
+        this.currentWeight = currentWeight;
         this.groupId = groupId;
         this.deviceId = deviceId;
+
+        getContext().getLog().info("FridgeWeightSensor started");
     }
 
     @Override
     public Receive<FridgeWeightSensorCommand> createReceive() {
         return newReceiveBuilder()
-                .onMessage(FridgeWeightSensor.GetAvailableWeightCommand.class, this::onGetAvailableWeight)
-                .onMessage(FridgeWeightSensor.AddWeightCommand.class, this::onAddWeight)
-                .onMessage(FridgeWeightSensor.RemoveWeightCommand.class, this::onRemoveWeight)
+                .onMessage(GetAvailableWeightCommand.class, this::onGetAvailableWeight)
+                .onMessage(AddWeightCommand.class, this::onAddWeight)
+                .onMessage(RemoveWeightCommand.class, this::onRemoveWeight)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }
