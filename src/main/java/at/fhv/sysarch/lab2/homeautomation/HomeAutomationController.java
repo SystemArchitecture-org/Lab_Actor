@@ -7,11 +7,8 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import at.fhv.sysarch.lab2.homeautomation.devices.AirCondition;
-import at.fhv.sysarch.lab2.homeautomation.devices.Blinds;
+import at.fhv.sysarch.lab2.homeautomation.devices.*;
 import at.fhv.sysarch.lab2.homeautomation.environment.Environment;
-import at.fhv.sysarch.lab2.homeautomation.devices.TemperatureSensor;
-import at.fhv.sysarch.lab2.homeautomation.devices.WeatherSensor;
 import at.fhv.sysarch.lab2.homeautomation.ui.UI;
 
 public class HomeAutomationController extends AbstractBehavior<Void> {
@@ -21,6 +18,7 @@ public class HomeAutomationController extends AbstractBehavior<Void> {
     private ActorRef<TemperatureSensor.TemperatureCommand> tempSensor;
     private ActorRef<WeatherSensor.WeatherCommand> weatherSensor;
     private ActorRef<Blinds.BlindsCommand> blinds;
+    private ActorRef<MediaStation.MediaStationCommand> mediaStation;
 
     public static Behavior<Void> create() {
         return Behaviors.setup(HomeAutomationController::new);
@@ -38,8 +36,9 @@ public class HomeAutomationController extends AbstractBehavior<Void> {
 
         this.blinds = getContext().spawn(Blinds.create("4", "1"), "Blinds");
         this.weatherSensor = getContext().spawn(WeatherSensor.create(this.environment, this.blinds, "3", "1"), "WeatherSensor");
+        this.mediaStation = getContext().spawn(MediaStation.create(this.blinds, "4", "1"), "MediaStation");
 
-        ActorRef<Void> ui = getContext().spawn(UI.create(this.environment, this.airCondition, this.tempSensor, this.weatherSensor), "UI");
+        ActorRef<Void> ui = getContext().spawn(UI.create(this.environment, this.airCondition, this.tempSensor, this.mediaStation), "UI");
         getContext().getLog().info("HomeAutomation Application started");
     }
 

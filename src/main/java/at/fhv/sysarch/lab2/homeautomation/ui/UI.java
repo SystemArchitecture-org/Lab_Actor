@@ -7,11 +7,8 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import at.fhv.sysarch.lab2.homeautomation.devices.AirCondition;
-import at.fhv.sysarch.lab2.homeautomation.devices.Blinds;
+import at.fhv.sysarch.lab2.homeautomation.devices.*;
 import at.fhv.sysarch.lab2.homeautomation.environment.Environment;
-import at.fhv.sysarch.lab2.homeautomation.devices.TemperatureSensor;
-import at.fhv.sysarch.lab2.homeautomation.devices.WeatherSensor;
 import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
 
 import java.util.Optional;
@@ -23,13 +20,13 @@ public class UI extends AbstractBehavior<Void> {
     private ActorRef<AirCondition.AirConditionCommand> airCondition;
     private ActorRef<TemperatureSensor.TemperatureCommand> tempSensor;
     private ActorRef<WeatherSensor.WeatherCommand> weatherSensor;
-//    private ActorRef<Blinds.BlindsCommand> weatherSensor;
+    private ActorRef<MediaStation.MediaStationCommand> mediaStation;
 
     public static Behavior<Void> create(
             ActorRef<Environment.EnvironmentCommand> environment,
             ActorRef<AirCondition.AirConditionCommand> airCondition,
             ActorRef<TemperatureSensor.TemperatureCommand> tempSensor,
-            ActorRef<WeatherSensor.WeatherCommand> weatherSensor
+            ActorRef<MediaStation.MediaStationCommand> mediaStation
     ) {
         return Behaviors.setup(context -> new UI(context, environment, airCondition, tempSensor, weatherSensor));
     }
@@ -39,7 +36,7 @@ public class UI extends AbstractBehavior<Void> {
             ActorRef<Environment.EnvironmentCommand> environment,
             ActorRef<AirCondition.AirConditionCommand> airCondition,
             ActorRef<TemperatureSensor.TemperatureCommand> tempSensor,
-            ActorRef<WeatherSensor.WeatherCommand> weatherSensor
+            ActorRef<MediaStation.MediaStationCommand> mediaStation
     ) {
         super(context);
 
@@ -49,8 +46,7 @@ public class UI extends AbstractBehavior<Void> {
         this.environment = environment;
         this.airCondition = airCondition;
         this.tempSensor = tempSensor;
-        this.weatherSensor = weatherSensor;
-
+        this.mediaStation = mediaStation;
 
         new Thread(this::runCommandLine).start();
 
@@ -83,6 +79,16 @@ public class UI extends AbstractBehavior<Void> {
             }
             if (command[0].equals("a")) {
                 this.airCondition.tell(new AirCondition.PowerAirCondition(Optional.of(Boolean.valueOf(command[1]))));
+            }
+            if (command[0].equals("m")) {
+                if (command[1].equals("on")) {
+                    this.mediaStation.tell(new MediaStation.StartMovieCommand());
+                } else if (command[1].equals("off")) {
+                    this.mediaStation.tell(new MediaStation.StopMovieCommand());
+                } else {
+                    System.out.println("wrong command");
+                    System.out.println("please try 'on' or 'off' ✔");
+                }
             }
             // TODO: process Input
         }

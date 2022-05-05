@@ -1,13 +1,12 @@
 package at.fhv.sysarch.lab2.homeautomation.devices;
 
-import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.PostStop;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import at.fhv.sysarch.lab2.homeautomation.domain.BlindsState;
+import at.fhv.sysarch.lab2.homeautomation.domain.enums.BlindsState;
 
 public class Blinds extends AbstractBehavior<Blinds.BlindsCommand> {
 
@@ -26,6 +25,7 @@ public class Blinds extends AbstractBehavior<Blinds.BlindsCommand> {
         return Behaviors.setup(context -> new Blinds(context, groupId, deviceId));
     }
 
+    private boolean isMoviePlaying = false;
     private final String groupId;
     private final String deviceId;
     private BlindsState blindsState = BlindsState.OPEN;
@@ -46,13 +46,14 @@ public class Blinds extends AbstractBehavior<Blinds.BlindsCommand> {
         return newReceiveBuilder()
                 .onMessage(Blinds.OpenBlindsCommand.class, this::onOpenBlindsCommand)
                 .onMessage(Blinds.CloseBlindsCommand.class, this::onCloseBlindsCommand)
+                .onMessage(Blinds.MovieStateChangedCommand.class, this::onMovieStateChangedCommand)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }
 
     private Behavior<Blinds.BlindsCommand> onOpenBlindsCommand(OpenBlindsCommand c) {
-        //only open blinds if they aren't already open
-        if (blindsState != BlindsState.OPEN) {
+        //only open blinds if they aren't already open and no movie is playing
+        if (blindsState != BlindsState.OPEN && !isMoviePlaying) {
             blindsState = BlindsState.OPEN;
             getContext().getLog().info("Blinds: {}", blindsState);
         }
@@ -65,6 +66,11 @@ public class Blinds extends AbstractBehavior<Blinds.BlindsCommand> {
             blindsState = BlindsState.CLOSED;
             getContext().getLog().info("Blinds: {}", blindsState);
         }
+        return this;
+    }
+
+    private Behavior<Blinds.BlindsCommand> onMovieStateChangedCommand(MovieStateChangedCommand c) {
+        this.isMoviePlaying = c.isMoviePlaying;
         return this;
     }
 

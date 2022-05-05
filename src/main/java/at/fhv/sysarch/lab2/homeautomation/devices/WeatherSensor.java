@@ -4,7 +4,7 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.PostStop;
 import akka.actor.typed.javadsl.*;
-import at.fhv.sysarch.lab2.homeautomation.domain.WeatherCondition;
+import at.fhv.sysarch.lab2.homeautomation.domain.enums.WeatherCondition;
 import at.fhv.sysarch.lab2.homeautomation.environment.Environment;
 
 import java.time.Duration;
@@ -74,6 +74,8 @@ public class WeatherSensor extends AbstractBehavior<WeatherSensor.WeatherCommand
 
     private Behavior<WeatherSensor.WeatherCommand> onReadWeather(WeatherSensor.ReadWeather r) {
         getContext().getLog().info("WeatherSensor received {}", r.weather);
+        //we call tell everytime not just when the weather actually changes because of the fire and forget implementation
+        //this way it's not a big deal if one message gets lost because it will still be triggered with the next one even if nothing changes
         if (r.weather == WeatherCondition.SUNNY) {
             blinds.tell(new Blinds.CloseBlindsCommand());
         } else {

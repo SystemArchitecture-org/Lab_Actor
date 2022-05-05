@@ -6,7 +6,7 @@ import akka.actor.typed.javadsl.*;
 import at.fhv.sysarch.lab2.homeautomation.devices.TemperatureSensor;
 import at.fhv.sysarch.lab2.homeautomation.devices.WeatherSensor;
 import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
-import at.fhv.sysarch.lab2.homeautomation.domain.WeatherCondition;
+import at.fhv.sysarch.lab2.homeautomation.domain.enums.WeatherCondition;
 
 import java.time.Duration;
 import java.util.Random;
