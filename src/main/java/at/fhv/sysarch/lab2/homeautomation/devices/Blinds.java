@@ -19,8 +19,16 @@ public class Blinds extends AbstractBehavior<Blinds.BlindsCommand> {
     public static final class OpenBlindsCommand implements BlindsCommand {
     }
 
+    public static final class MovieStateChangedCommand implements BlindsCommand {
+        boolean isMoviePlaying;
+
+        public MovieStateChangedCommand(boolean isMoviePlaying) {
+            this.isMoviePlaying = isMoviePlaying;
+        }
+    }
+
     public static Behavior<BlindsCommand> create(String groupId,
-            String deviceId
+                                                 String deviceId
     ) {
         return Behaviors.setup(context -> new Blinds(context, groupId, deviceId));
     }
@@ -61,7 +69,7 @@ public class Blinds extends AbstractBehavior<Blinds.BlindsCommand> {
     }
 
     private Behavior<Blinds.BlindsCommand> onCloseBlindsCommand(CloseBlindsCommand c) {
-       //only close blinds if they aren't already closed
+        //only close blinds if they aren't already closed
         if (blindsState != BlindsState.CLOSED) {
             blindsState = BlindsState.CLOSED;
             getContext().getLog().info("Blinds: {}", blindsState);

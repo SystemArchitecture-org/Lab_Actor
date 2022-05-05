@@ -32,7 +32,8 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
 
     public static final class ReceiveWeatherRequest implements EnvironmentCommand {
         ActorRef<WeatherSensor.WeatherCommand> weatherSensor;
-        public ReceiveWeatherRequest(ActorRef<WeatherSensor.WeatherCommand> weatherSensor){
+
+        public ReceiveWeatherRequest(ActorRef<WeatherSensor.WeatherCommand> weatherSensor) {
             this.weatherSensor = weatherSensor;
         }
     }
@@ -69,12 +70,12 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
                 .build();
     }
 
-    private Behavior<EnvironmentCommand> onReceiveTemperatureRequest(ReceiveTemperatureRequest request){
+    private Behavior<EnvironmentCommand> onReceiveTemperatureRequest(ReceiveTemperatureRequest request) {
         request.temperatureSensor.tell(new TemperatureSensor.ReadTemperature(temperature));
         return this;
     }
 
-    private Behavior<EnvironmentCommand> onReceiveWeatherRequest(ReceiveWeatherRequest request){
+    private Behavior<EnvironmentCommand> onReceiveWeatherRequest(ReceiveWeatherRequest request) {
         request.weatherSensor.tell(new WeatherSensor.ReadWeather(weatherCondition));
         return this;
     }

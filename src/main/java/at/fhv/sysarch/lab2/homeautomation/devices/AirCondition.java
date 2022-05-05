@@ -20,7 +20,9 @@ import akka.actor.typed.javadsl.Receive;
 import java.util.Optional;
 
 public class AirCondition extends AbstractBehavior<AirCondition.AirConditionCommand> {
-    public interface AirConditionCommand {}
+
+    public interface AirConditionCommand {
+    }
 
     public static final class PowerAirCondition implements AirConditionCommand {
         final Optional<Boolean> value;
@@ -68,13 +70,12 @@ public class AirCondition extends AbstractBehavior<AirCondition.AirConditionComm
     private Behavior<AirConditionCommand> onReadTemperature(EnrichedTemperature r) {
         getContext().getLog().info("AirCondition reading {}", r.value.get());
 
-        if(r.value.get() >= 20) {
+        if (r.value.get() >= 20) {
             getContext().getLog().info("AirCondition activated");
             this.active = true;
-        }
-        else {
+        } else {
             getContext().getLog().info("AirCondition deactivated");
-            this.active =  false;
+            this.active = false;
         }
 
         return Behaviors.same();
@@ -83,7 +84,7 @@ public class AirCondition extends AbstractBehavior<AirCondition.AirConditionComm
     private Behavior<AirConditionCommand> onPowerAirConditionOff(PowerAirCondition r) {
         getContext().getLog().info("Turning AirCondition to {}", r.value);
 
-        if(!r.value.get()) {
+        if (!r.value.get()) {
             return this.powerOff();
         }
 
@@ -93,7 +94,7 @@ public class AirCondition extends AbstractBehavior<AirCondition.AirConditionComm
     private Behavior<AirConditionCommand> onPowerAirConditionOn(PowerAirCondition r) {
         getContext().getLog().info("Turning AirCondition to {}", r.value);
 
-        if(r.value.get()) {
+        if (r.value.get()) {
             return Behaviors.receive(AirConditionCommand.class)
                     .onMessage(EnrichedTemperature.class, this::onReadTemperature)
                     .onMessage(PowerAirCondition.class, this::onPowerAirConditionOff)

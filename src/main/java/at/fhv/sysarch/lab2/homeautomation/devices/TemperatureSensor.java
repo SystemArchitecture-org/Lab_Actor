@@ -12,12 +12,13 @@ import java.util.Optional;
 
 public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.TemperatureCommand> {
 
-    public interface TemperatureCommand {}
+    public interface TemperatureCommand {
+    }
 
     public static final class ReadTemperature implements TemperatureCommand {
         Temperature temperature;
 
-        public ReadTemperature(Temperature temperature){
+        public ReadTemperature(Temperature temperature) {
             this.temperature = temperature;
         }
     }
@@ -28,7 +29,7 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
     public static Behavior<TemperatureCommand> create(
             ActorRef<AirCondition.AirConditionCommand> airCondition,
             ActorRef<Environment.EnvironmentCommand> environment,
-            String groupId, 
+            String groupId,
             String deviceId
     ) {
         return Behaviors.setup(context -> Behaviors.withTimers(timer -> new TemperatureSensor(context, airCondition, environment, groupId, deviceId, timer)));

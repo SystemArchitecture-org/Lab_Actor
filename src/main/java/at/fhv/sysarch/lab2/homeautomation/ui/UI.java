@@ -28,7 +28,7 @@ public class UI extends AbstractBehavior<Void> {
             ActorRef<TemperatureSensor.TemperatureCommand> tempSensor,
             ActorRef<MediaStation.MediaStationCommand> mediaStation
     ) {
-        return Behaviors.setup(context -> new UI(context, environment, airCondition, tempSensor, weatherSensor));
+        return Behaviors.setup(context -> new UI(context, environment, airCondition, tempSensor, mediaStation));
     }
 
     private UI(
@@ -72,7 +72,7 @@ public class UI extends AbstractBehavior<Void> {
 
         while (!reader.equalsIgnoreCase("quit") && scanner.hasNextLine()) {
             reader = scanner.nextLine();
-            // TODO: change input handling
+            // TODO: change input handling*
             String[] command = reader.split(" ");
             if (command[0].equals("t")) {
                 this.tempSensor.tell(new TemperatureSensor.ReadTemperature(new Temperature(Double.parseDouble(command[1]), "Celsius")));
