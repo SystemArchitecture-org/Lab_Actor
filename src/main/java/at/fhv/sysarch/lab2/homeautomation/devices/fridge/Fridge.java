@@ -12,6 +12,7 @@ import at.fhv.sysarch.lab2.homeautomation.domain.valueobjects.Product;
 import java.sql.SQLOutput;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
 
@@ -65,7 +66,7 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
     ) {
         super(context);
 
-        this.products = new LinkedList<>(List.of(
+        this.products = new ArrayList<>(List.of(
                 Product.create("apple").get(),
                 Product.create("apple").get(),
                 Product.create("apple").get(),
@@ -86,16 +87,16 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
     public Receive<FridgeCommand> createReceive() {
         return newReceiveBuilder()
                 .onMessage(RequestOrderProductCommand.class, this::onRequestOrderProduct)
-                .onMessage(Fridge.ConsumeProductCommand.class, this::onConsumeProduct)
-                .onMessage(Fridge.StockFridgeCommand.class, this::onStockFridge)
-                .onMessage(Fridge.DisplayStockCommand.class, this::onDisplayStock)
+                .onMessage(ConsumeProductCommand.class, this::onConsumeProduct)
+                .onMessage(StockFridgeCommand.class, this::onStockFridge)
+                .onMessage(DisplayStockCommand.class, this::onDisplayStock)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }
 
     private Behavior<FridgeCommand> onRequestOrderProduct(RequestOrderProductCommand c) {
 
-        getContext().spawn(OrderProcessor.create(getContext().getSelf(), weightSensor, c.product, "1", "1"), "OrderProcessor");
+        getContext().spawn(OrderProcessor.create(getContext().getSelf(), weightSensor, spaceSensor, c.product, "1", "1"), "OrderProcessor" + UUID.randomUUID());
 
         return this;
     }
@@ -112,6 +113,9 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
 
     private Behavior<FridgeCommand> onStockFridge(StockFridgeCommand c) {
         products.add(c.product);
+        weightSensor.tell(new FridgeWeightSensor.AddWeightCommand(c.product.getWeight()));
+        spaceSensor.tell(new FridgeSpaceSensor.AddSpaceCommand());
+        getContext().getLog().info("Added {} to fridge", c.product.getName());
         return this;
     }
 

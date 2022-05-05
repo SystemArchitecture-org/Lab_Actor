@@ -22,7 +22,23 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
     public static final class WeatherChanger implements EnvironmentCommand {
     }
 
-    public static final class ReceiveTemperatureRequest implements EnvironmentCommand {
+    public static final class SetTemperatureCommand implements EnvironmentCommand {
+        Temperature temperature;
+
+        public SetTemperatureCommand(Temperature temperature) {
+            this.temperature = temperature;
+        }
+    }
+
+    public static final class SetWeatherCommand implements EnvironmentCommand {
+        WeatherCondition weatherCondition;
+
+        public SetWeatherCommand(WeatherCondition weatherCondition) {
+            this.weatherCondition = weatherCondition;
+        }
+    }
+
+    public static final class ReceiveTemperatureRequestCommand implements EnvironmentCommand {
         ActorRef<TemperatureSensor.TemperatureCommand> temperatureSensor;
 
         public ReceiveTemperatureRequest(ActorRef<TemperatureSensor.TemperatureCommand> temperatureSensor) {
@@ -98,7 +114,18 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
         return this;
     }
 
-    private Behavior<EnvironmentCommand> onWeatherChange(WeatherChanger weatherChanger) {
+    private Behavior<EnvironmentCommand> onSetTemperature(SetTemperatureCommand c) {
+        this.temperature = c.temperature;
+        return this;
+    }
+
+    private Behavior<EnvironmentCommand> onSetWeather(SetWeatherCommand c) {
+        this.weatherCondition = c.weatherCondition;
+        return this;
+    }
+
+
+    private Behavior<EnvironmentCommand> onWeatherChange(WeatherChangerCommand weatherChanger) {
         Random rand = new Random();
 
         weatherCondition = WeatherCondition.values()[rand.nextInt(WeatherCondition.values().length)];

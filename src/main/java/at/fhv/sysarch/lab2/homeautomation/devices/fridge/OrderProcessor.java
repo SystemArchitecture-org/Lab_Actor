@@ -47,6 +47,7 @@ public class OrderProcessor extends AbstractBehavior<OrderProcessor.OrderProcess
 
     private ActorRef<Fridge.FridgeCommand> fridge;
     private ActorRef<FridgeWeightSensor.FridgeWeightSensorCommand> weightSensor;
+    private ActorRef<FridgeSpaceSensor.FridgeSpaceSensorCommand> spaceSensor;
     private final Product product;
     private final String groupId;
     private final String deviceId;
@@ -56,6 +57,7 @@ public class OrderProcessor extends AbstractBehavior<OrderProcessor.OrderProcess
             ActorContext<OrderProcessorCommand> context,
             ActorRef<Fridge.FridgeCommand> fridge,
             ActorRef<FridgeWeightSensor.FridgeWeightSensorCommand> weightSensor,
+            ActorRef<FridgeSpaceSensor.FridgeSpaceSensorCommand> spaceSensor,
             Product product,
             String groupId,
             String deviceId
@@ -68,6 +70,9 @@ public class OrderProcessor extends AbstractBehavior<OrderProcessor.OrderProcess
         this.weightSensor = weightSensor;
 
         weightSensor.tell(new FridgeWeightSensor.GetAvailableWeightCommand(getContext().getSelf()));
+        spaceSensor.tell(new FridgeSpaceSensor.GetAvailableSpaceCommand(getContext().getSelf()));
+
+        getContext().getLog().info("OrderProcessor started");
     }
 
     @Override

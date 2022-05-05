@@ -90,7 +90,30 @@ public class UI extends AbstractBehavior<Void> {
                     System.out.println("please try 'on' or 'off' ✔");
                 }
             }
-            // TODO: process Input
+
+            if (command[0].equals("fadd")) {
+                Optional<Product> product = Product.create(command[1]);
+                if (product.isPresent()) {
+                    this.fridge.tell(new Fridge.RequestOrderProductCommand(product.get()));
+                } else {
+                    System.out.println("wrong product try: 'apple', 'watermelon' or 'beer'");
+                }
+            }
+            if (command[0].equals("frem")) {
+                Optional<Product> product = Product.create(command[1]);
+                if (product.isPresent()) {
+                    this.fridge.tell(new Fridge.ConsumeProductCommand(product.get()));
+                } else {
+                    System.out.println("wrong product try: 'apple', 'watermelon' or 'beer'");
+                }
+            }
+            if (command[0].equals("fdis")) {
+                this.fridge.tell(new Fridge.DisplayStockCommand());
+            }
+            if (command[0].equals("etemp")) {
+                //TODO: implement set temp on environment
+                this.environment.tell(new Environment.SetTemperatureCommand(new Temperature(Double.parseDouble(command[1]), "Celsius")));
+            }
         }
         getContext().getLog().info("UI done");
     }
