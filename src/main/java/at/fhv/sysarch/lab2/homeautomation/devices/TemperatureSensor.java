@@ -22,9 +22,7 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
     }
 
     public static final class RequestTemperatureFromEnvironment implements TemperatureCommand {
-
     }
-
 
     public static Behavior<TemperatureCommand> create(
             ActorRef<AirCondition.AirConditionCommand> airCondition,
@@ -55,6 +53,7 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
         this.environment = environment;
 
         getContext().getLog().info("TemperatureSensor started");
+
         temperatureTimeScheduler.startTimerAtFixedRate(new RequestTemperatureFromEnvironment(), Duration.ofSeconds(5));
     }
 

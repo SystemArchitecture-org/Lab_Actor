@@ -12,6 +12,7 @@ import at.fhv.sysarch.lab2.homeautomation.HomeAutomationController;
 import at.fhv.sysarch.lab2.homeautomation.devices.AirCondition;
 import at.fhv.sysarch.lab2.homeautomation.devices.Environment;
 import at.fhv.sysarch.lab2.homeautomation.devices.TemperatureSensor;
+import at.fhv.sysarch.lab2.homeautomation.devices.WeatherSensor;
 import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
 
 import java.util.Optional;
@@ -20,14 +21,26 @@ import java.util.Scanner;
 public class UI extends AbstractBehavior<Void> {
 
     private ActorRef<Environment.EnvironmentCommand> environment;
-    private ActorRef<TemperatureSensor.TemperatureCommand> tempSensor;
     private ActorRef<AirCondition.AirConditionCommand> airCondition;
+    private ActorRef<TemperatureSensor.TemperatureCommand> tempSensor;
+    private ActorRef<WeatherSensor.WeatherCommand> weatherSensor;
 
-    public static Behavior<Void> create(ActorRef<Environment.EnvironmentCommand> environment, ActorRef<TemperatureSensor.TemperatureCommand> tempSensor, ActorRef<AirCondition.AirConditionCommand> airCondition) {
-        return Behaviors.setup(context -> new UI(context, environment, tempSensor, airCondition));
+    public static Behavior<Void> create(
+            ActorRef<Environment.EnvironmentCommand> environment,
+            ActorRef<AirCondition.AirConditionCommand> airCondition,
+            ActorRef<TemperatureSensor.TemperatureCommand> tempSensor,
+            ActorRef<WeatherSensor.WeatherCommand> weatherSensor
+    ) {
+        return Behaviors.setup(context -> new UI(context, environment, airCondition, tempSensor, weatherSensor));
     }
 
-    private UI(ActorContext<Void> context, ActorRef<Environment.EnvironmentCommand> environment, ActorRef<TemperatureSensor.TemperatureCommand> tempSensor, ActorRef<AirCondition.AirConditionCommand> airCondition) {
+    private UI(
+            ActorContext<Void> context,
+            ActorRef<Environment.EnvironmentCommand> environment,
+            ActorRef<AirCondition.AirConditionCommand> airCondition,
+            ActorRef<TemperatureSensor.TemperatureCommand> tempSensor,
+            ActorRef<WeatherSensor.WeatherCommand> weatherSensor
+    ) {
         super(context);
 
         // TODO: implement actor and behavior as needed
@@ -36,6 +49,7 @@ public class UI extends AbstractBehavior<Void> {
         this.environment = environment;
         this.airCondition = airCondition;
         this.tempSensor = tempSensor;
+        this.weatherSensor = weatherSensor;
 
         new Thread(this::runCommandLine).start();
 

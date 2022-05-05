@@ -1,6 +1,5 @@
 package at.fhv.sysarch.lab2.homeautomation;
 
-import akka.actor.TypedActor;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.PostStop;
@@ -11,12 +10,15 @@ import akka.actor.typed.javadsl.Receive;
 import at.fhv.sysarch.lab2.homeautomation.devices.AirCondition;
 import at.fhv.sysarch.lab2.homeautomation.devices.Environment;
 import at.fhv.sysarch.lab2.homeautomation.devices.TemperatureSensor;
+import at.fhv.sysarch.lab2.homeautomation.devices.WeatherSensor;
 import at.fhv.sysarch.lab2.homeautomation.ui.UI;
 
 public class HomeAutomationController extends AbstractBehavior<Void> {
-    private ActorRef<TemperatureSensor.TemperatureCommand> tempSensor;
-    private ActorRef<AirCondition.AirConditionCommand> airCondition;
+
     private ActorRef<Environment.EnvironmentCommand> environment;
+    private ActorRef<AirCondition.AirConditionCommand> airCondition;
+    private ActorRef<TemperatureSensor.TemperatureCommand> tempSensor;
+    private ActorRef<WeatherSensor.WeatherCommand> weatherSensor;
 
     public static Behavior<Void> create() {
         return Behaviors.setup(HomeAutomationController::new);
@@ -29,10 +31,11 @@ public class HomeAutomationController extends AbstractBehavior<Void> {
 
         this.environment = getContext().spawn(Environment.create(), "Environment");
         this.airCondition = getContext().spawn(AirCondition.create("2", "1"), "AirCondition");
-        this.tempSensor = getContext().spawn(TemperatureSensor.create(this.airCondition, this.environment, "1", "1"), "temperatureSensor");
+        this.tempSensor = getContext().spawn(TemperatureSensor.create(this.airCondition, this.environment, "1", "1"), "TemperatureSensor");
+        this.weatherSensor = getContext().spawn(WeatherSensor.create(this.environment, "3", "1"), "WeatherSensor");
 
 
-        ActorRef<Void> ui = getContext().spawn(UI.create(this.environment, this.tempSensor, this.airCondition), "UI");
+        ActorRef<Void> ui = getContext().spawn(UI.create(this.environment, this.airCondition, this.tempSensor, this.weatherSensor), "UI");
         getContext().getLog().info("HomeAutomation Application started");
     }
 
@@ -45,4 +48,5 @@ public class HomeAutomationController extends AbstractBehavior<Void> {
         getContext().getLog().info("HomeAutomation Application stopped");
         return this;
     }
+
 }
