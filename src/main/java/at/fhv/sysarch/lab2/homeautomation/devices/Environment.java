@@ -4,6 +4,7 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
 import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
+import at.fhv.sysarch.lab2.homeautomation.domain.WeatherCondition;
 
 import java.time.Duration;
 import java.util.Random;
@@ -27,12 +28,19 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
         }
     }
 
+    public static final class ReceiveWeatherRequest implements EnvironmentCommand {
+        ActorRef<WeatherSensor.WeatherCommand> weatherSensor;
+        public ReceiveWeatherRequest(ActorRef<WeatherSensor.WeatherCommand> weatherSensor){
+            this.weatherSensor = weatherSensor;
+        }
+    }
+
     public static Behavior<EnvironmentCommand> create() {
         return Behaviors.setup(context -> Behaviors.withTimers(timers -> new Environment(context, timers, timers)));
     }
 
     private Temperature temperature = new Temperature(23, "Celsius");
-    private boolean isSunny = false;
+    private WeatherCondition weatherCondition = WeatherCondition.SUNNY;
     private boolean setHighTemp = false;
     private boolean setLowTemp = true;
 
@@ -53,6 +61,7 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
     public Receive<EnvironmentCommand> createReceive() {
         return newReceiveBuilder()
                 .onMessage(ReceiveTemperatureRequest.class, this::onReceiveTemperatureRequest)
+                .onMessage(ReceiveWeatherRequest.class, this::onReceiveWeatherRequest)
                 .onMessage(TemperatureChanger.class, this::onTemperatureChange)
                 .onMessage(WeatherChanger.class, this::onWeatherChange)
                 .build();
@@ -60,6 +69,11 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
 
     private Behavior<EnvironmentCommand> onReceiveTemperatureRequest(ReceiveTemperatureRequest request){
         request.temperatureSensor.tell(new TemperatureSensor.ReadTemperature(temperature));
+        return this;
+    }
+
+    private Behavior<EnvironmentCommand> onReceiveWeatherRequest(ReceiveWeatherRequest request){
+        request.weatherSensor.tell(new WeatherSensor.ReadWeather(weatherCondition));
         return this;
     }
 
@@ -84,9 +98,9 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
     private Behavior<EnvironmentCommand> onWeatherChange(WeatherChanger weatherChanger) {
         Random rand = new Random();
 
-        isSunny = rand.nextBoolean();
+        weatherCondition = WeatherCondition.values()[rand.nextInt(WeatherCondition.values().length)];
 
-        System.out.println("Sunny: " + isSunny);
+        System.out.println("WeatherCondition: " + weatherCondition);
 
         return this;
     }
