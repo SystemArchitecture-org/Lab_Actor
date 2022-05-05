@@ -5,6 +5,7 @@ import akka.actor.typed.Behavior;
 import akka.actor.typed.PostStop;
 import akka.actor.typed.javadsl.*;
 import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
+import at.fhv.sysarch.lab2.homeautomation.environment.Environment;
 
 import java.time.Duration;
 import java.util.Optional;

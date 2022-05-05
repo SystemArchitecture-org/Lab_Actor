@@ -1,8 +1,10 @@
-package at.fhv.sysarch.lab2.homeautomation.devices;
+package at.fhv.sysarch.lab2.homeautomation.environment;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
+import at.fhv.sysarch.lab2.homeautomation.devices.TemperatureSensor;
+import at.fhv.sysarch.lab2.homeautomation.devices.WeatherSensor;
 import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
 import at.fhv.sysarch.lab2.homeautomation.domain.WeatherCondition;
 
@@ -54,7 +56,7 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
         this.weatherTimeScheduler = weatherTimeScheduler;
 
         temperatureTimeScheduler.startTimerAtFixedRate(new TemperatureChanger(), Duration.ofSeconds(5));
-        weatherTimeScheduler.startTimerAtFixedRate(new WeatherChanger(), Duration.ofSeconds(35));
+        weatherTimeScheduler.startTimerAtFixedRate(new WeatherChanger(), Duration.ofSeconds(5));
     }
 
     @Override

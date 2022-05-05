@@ -1,16 +1,15 @@
 package at.fhv.sysarch.lab2.homeautomation.ui;
 
 import akka.actor.typed.ActorRef;
-import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.PostStop;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import at.fhv.sysarch.lab2.homeautomation.HomeAutomationController;
 import at.fhv.sysarch.lab2.homeautomation.devices.AirCondition;
-import at.fhv.sysarch.lab2.homeautomation.devices.Environment;
+import at.fhv.sysarch.lab2.homeautomation.devices.Blinds;
+import at.fhv.sysarch.lab2.homeautomation.environment.Environment;
 import at.fhv.sysarch.lab2.homeautomation.devices.TemperatureSensor;
 import at.fhv.sysarch.lab2.homeautomation.devices.WeatherSensor;
 import at.fhv.sysarch.lab2.homeautomation.domain.Temperature;
