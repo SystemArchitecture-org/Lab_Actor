@@ -121,7 +121,14 @@ public class UI extends AbstractBehavior<Void> {
                 this.environment.tell(new Environment.SetWeatherCommand(WeatherCondition.valueOf(command[1])));
             }
             if (command[0].equals("?")) {
-                //TODO: print commands
+                System.out.println("Commands:");
+                System.out.println("t [temperature]                 - set temperature");
+                System.out.println("a                               - turn on/off air condition");
+                System.out.println("m [on|off]                      - turn on/off movie station");
+                System.out.println("fadd [apple|watermelon|beer]    - add item to fridge");
+                System.out.println("frem [apple|watermelon|beer]    - remove item from fridge");
+                System.out.println("fdis                            - display stock of fridge");
+                System.out.println("ew [SUNNY|CLOUDY]               - set weather condition");
             }
         }
 

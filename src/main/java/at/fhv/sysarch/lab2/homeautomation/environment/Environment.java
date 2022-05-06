@@ -60,8 +60,6 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
 
     private Temperature temperature = new Temperature(23, "Celsius");
     private WeatherCondition weatherCondition = WeatherCondition.SUNNY;
-    private boolean setHighTemp = false;
-    private boolean setLowTemp = true;
 
     private final TimerScheduler<EnvironmentCommand> temperatureTimeScheduler;
     private final TimerScheduler<EnvironmentCommand> weatherTimeScheduler;
@@ -100,15 +98,6 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
 
     private Behavior<EnvironmentCommand> onTemperatureChange(TemperatureChangerCommand temperatureChanger) {
         double newRanValue = this.temperature.getValue() + (4 * new Random().nextDouble() - 2);
-
-        //TODO: Do we need this?
-        if (newRanValue >= 25) {
-            setHighTemp = true;
-            setLowTemp = false;
-        } else {
-            setLowTemp = true;
-            setHighTemp = false;
-        }
 
         this.temperature.setValue(newRanValue);
 
