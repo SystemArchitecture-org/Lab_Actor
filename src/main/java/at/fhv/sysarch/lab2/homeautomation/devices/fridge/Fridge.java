@@ -10,6 +10,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import at.fhv.sysarch.lab2.homeautomation.domain.Order;
 import at.fhv.sysarch.lab2.homeautomation.domain.valueobjects.Product;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +46,9 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
     }
 
     public static final class DisplayStockCommand implements FridgeCommand {
+    }
+
+    public static final class DisplayOrderHistoryCommand implements FridgeCommand {
     }
 
     public static Behavior<FridgeCommand> create(
@@ -111,7 +115,6 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
         return this;
     }
 
-    //TODO: do we need ignoring replies?
     private Behavior<FridgeCommand> onConsumeProduct(ConsumeProductCommand c) {
         if (products.contains(c.product)) {
             products.remove(c.product);
@@ -121,8 +124,6 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
         }
         return this;
     }
-
-    //TODO: The Fridge allows for querying the history of orders.
 
     private Behavior<FridgeCommand> onStockFridge(StockFridgeCommand c) {
         products.add(c.product);
@@ -134,11 +135,25 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
     }
 
     private Behavior<FridgeCommand> onDisplayStock(DisplayStockCommand c) {
-        System.out.println("Fridge content:\n");
+        System.out.println("\nFridge content:\n");
 
         for (Product product : this.products) {
             System.out.println(product.toString());
         }
+
+        System.out.println();
+
+        return this;
+    }
+
+    private Behavior<FridgeCommand> onDisplayOrderHistory(DisplayOrderHistoryCommand c) {
+        System.out.println("\nOrder history:\n");
+
+        for (Order order : this.orders) {
+            System.out.println(order.toString());
+        }
+
+        System.out.println();
 
         return this;
     }
