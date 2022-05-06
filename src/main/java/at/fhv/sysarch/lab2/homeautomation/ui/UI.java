@@ -114,8 +114,8 @@ public class UI extends AbstractBehavior<Void> {
             if (command[0].equals("fdis")) {
                 this.fridge.tell(new Fridge.DisplayStockCommand());
             }
-            if (command[0].equals("et")) {
-                this.environment.tell(new Environment.SetTemperatureCommand(new Temperature(Double.parseDouble(command[1]), "Celsius")));
+            if (command[0].equals("dhis")) {
+                this.fridge.tell(new Fridge.DisplayOrderHistoryCommand());
             }
             if (command[0].equals("ew")) {
                 this.environment.tell(new Environment.SetWeatherCommand(WeatherCondition.valueOf(command[1])));
@@ -128,6 +128,7 @@ public class UI extends AbstractBehavior<Void> {
                 System.out.println("fadd [apple|watermelon|beer]    - add item to fridge");
                 System.out.println("frem [apple|watermelon|beer]    - remove item from fridge");
                 System.out.println("fdis                            - display stock of fridge");
+                System.out.println("dhis                            - displays oder history");
                 System.out.println("ew [SUNNY|CLOUDY]               - set weather condition");
             }
         }

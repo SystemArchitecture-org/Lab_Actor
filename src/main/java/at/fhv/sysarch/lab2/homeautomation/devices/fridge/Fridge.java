@@ -7,6 +7,7 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Receive;
 import akka.actor.typed.javadsl.Behaviors;
+import at.fhv.sysarch.lab2.homeautomation.domain.Order;
 import at.fhv.sysarch.lab2.homeautomation.domain.valueobjects.Product;
 
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
         return Behaviors.setup(context -> new Fridge(context, groupId, deviceId));
     }
 
+    private final List<Order> orders;
     private final List<Product> products;
     private final String groupId;
     private final String deviceId;
@@ -67,6 +69,7 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
     ) {
         super(context);
 
+        this.orders = new LinkedList<>();
         this.products = new ArrayList<>(List.of(
                 Product.create("apple").get(),
                 Product.create("apple").get(),
@@ -96,6 +99,7 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
                 .onMessage(ConsumeProductCommand.class, this::onConsumeProduct)
                 .onMessage(StockFridgeCommand.class, this::onStockFridge)
                 .onMessage(DisplayStockCommand.class, this::onDisplayStock)
+                .onMessage(DisplayOrderHistoryCommand.class, this::onDisplayOrderHistory)
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }
@@ -125,6 +129,7 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
         weightSensor.tell(new FridgeWeightSensor.AddWeightCommand(c.product.getWeight()));
         spaceSensor.tell(new FridgeSpaceSensor.AddSpaceCommand());
         getContext().getLog().info("Added {} to fridge", c.product.getName());
+        orders.add(new Order(c.product));
         return this;
     }
 
