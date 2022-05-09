@@ -119,9 +119,20 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
         if (products.contains(c.product)) {
             products.remove(c.product);
             getContext().getLog().info("Removed {} from fridge", c.product.getName());
+            weightSensor.tell(new FridgeWeightSensor.RemoveWeightCommand(c.product.getWeight()));
+            spaceSensor.tell(new FridgeSpaceSensor.RemoveSpaceCommand(1));
+
+            //restock fridge
+            if(!products.contains(c.product)){
+                getContext().getLog().info("Last {} consumed, ordering more...", c.product.getName());
+                getContext().getSelf().tell(new RequestOrderProductCommand(c.product));
+            }
+
         } else {
             getContext().getLog().info("No {} in fridge", c.product.getName());
         }
+
+
         return this;
     }
 
