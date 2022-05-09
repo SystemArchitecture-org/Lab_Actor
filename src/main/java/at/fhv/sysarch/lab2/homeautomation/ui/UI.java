@@ -79,7 +79,6 @@ public class UI extends AbstractBehavior<Void> {
             if (command[0].equals("t")) {
                 this.tempSensor.tell(new TemperatureSensor.ReadTemperatureCommand(new Temperature(Double.parseDouble(command[1]), "Celsius")));
             }
-
             if (command[0].equals("a")) {
                 this.airCondition.tell(new AirCondition.PowerAirConditionCommand(Optional.of(Boolean.valueOf(command[1]))));
             }
@@ -123,7 +122,7 @@ public class UI extends AbstractBehavior<Void> {
             if (command[0].equals("?")) {
                 System.out.println("Commands:");
                 System.out.println("t [temperature]                 - set temperature");
-                System.out.println("a                               - turn on/off air condition");
+                System.out.println("a [true|false]                  - turn on/off air condition");
                 System.out.println("m [on|off]                      - turn on/off movie station");
                 System.out.println("fadd [apple|watermelon|beer]    - add item to fridge");
                 System.out.println("frem [apple|watermelon|beer]    - remove item from fridge");
