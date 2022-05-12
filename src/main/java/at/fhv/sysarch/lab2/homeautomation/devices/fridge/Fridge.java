@@ -11,6 +11,7 @@ import at.fhv.sysarch.lab2.homeautomation.domain.Order;
 import at.fhv.sysarch.lab2.homeautomation.domain.valueobjects.Product;
 
 import java.sql.SQLOutput;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -123,7 +124,7 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
             spaceSensor.tell(new FridgeSpaceSensor.RemoveSpaceCommand(1));
 
             //restock fridge
-            if(!products.contains(c.product)){
+            if (!products.contains(c.product)) {
                 getContext().getLog().info("Last {} consumed, ordering more...", c.product.getName());
                 getContext().getSelf().tell(new RequestOrderProductCommand(c.product));
             }
@@ -141,7 +142,17 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
         weightSensor.tell(new FridgeWeightSensor.AddWeightCommand(c.product.getWeight()));
         spaceSensor.tell(new FridgeSpaceSensor.AddSpaceCommand());
         getContext().getLog().info("Added {} to fridge", c.product.getName());
-        orders.add(new Order(c.product));
+
+        Order order = new Order(c.product);
+        Product product = order.getProduct();
+
+        System.out.println("\nReceipt:\n" +
+                order.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "\n\n" +
+                "Items \n" + product.toString() + "\n\n" +
+                "Total \t€" + product.getPrice() + "\n"
+        );
+
+        orders.add(order);
         return this;
     }
 
