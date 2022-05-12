@@ -82,6 +82,10 @@ public class Blinds extends AbstractBehavior<Blinds.BlindsCommand> {
 
     private Behavior<Blinds.BlindsCommand> onMovieStateChangedCommand(MovieStateChangedCommand c) {
         this.isMoviePlaying = c.isMoviePlaying;
+        if(isMoviePlaying && blindsState != BlindsState.CLOSED) {
+            blindsState = BlindsState.CLOSED;
+            getContext().getLog().info("Blinds: {}", blindsState);
+        }
         return this;
     }
 

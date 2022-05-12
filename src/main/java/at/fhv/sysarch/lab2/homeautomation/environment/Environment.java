@@ -71,7 +71,7 @@ public class Environment extends AbstractBehavior<Environment.EnvironmentCommand
         this.weatherTimeScheduler = weatherTimeScheduler;
 
         temperatureTimeScheduler.startTimerAtFixedRate(new TemperatureChangerCommand(), Duration.ofSeconds(5));
-        weatherTimeScheduler.startTimerAtFixedRate(new WeatherChangerCommand(), Duration.ofSeconds(5));
+        weatherTimeScheduler.startTimerAtFixedRate(new WeatherChangerCommand(), Duration.ofSeconds(35));
     }
 
     @Override

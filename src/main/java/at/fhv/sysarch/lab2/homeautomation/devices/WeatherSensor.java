@@ -74,8 +74,6 @@ public class WeatherSensor extends AbstractBehavior<WeatherSensor.WeatherCommand
 
     private Behavior<WeatherSensor.WeatherCommand> onReadWeather(ReadWeatherCommand c) {
         getContext().getLog().info("WeatherSensor received {}", c.weather);
-        //we call tell everytime not just when the weather actually changes because of the fire and forget implementation
-        //this way it's not a big deal if one message gets lost because it will still be triggered with the next one even if nothing changes
         if (c.weather == WeatherCondition.SUNNY) {
             blinds.tell(new Blinds.CloseBlindsCommand());
         } else {

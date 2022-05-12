@@ -74,10 +74,10 @@ public class AirCondition extends AbstractBehavior<AirCondition.AirConditionComm
         getContext().getLog().info("AirCondition reading {}", c.value.get());
 
         if (c.value.get() >= 20) {
-            getContext().getLog().info("AirCondition activated");
+            getContext().getLog().info("AirCondition is activated");
             this.active = true;
         } else {
-            getContext().getLog().info("AirCondition deactivated");
+            getContext().getLog().info("AirCondition is deactivated");
             this.active = false;
         }
 
