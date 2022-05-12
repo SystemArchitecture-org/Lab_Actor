@@ -133,7 +133,6 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
             getContext().getLog().info("No {} in fridge", c.product.getName());
         }
 
-
         return this;
     }
 
@@ -148,7 +147,7 @@ public class Fridge extends AbstractBehavior<Fridge.FridgeCommand> {
 
         System.out.println("\nReceipt:\n" +
                 order.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "\n\n" +
-                "Items \n" + product.toString() + "\n\n" +
+                product.toString() + "\n\n" +
                 "Total \t€" + product.getPrice() + "\n"
         );
 
